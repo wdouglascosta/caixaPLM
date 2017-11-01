@@ -2,6 +2,7 @@
 # que solicitou determinado valor de um caixa eletronico,
 # considerando a existencia de uma quantidade finita de alguns
 # tipos de notas
+#ta errado
 
 .section .data
 
