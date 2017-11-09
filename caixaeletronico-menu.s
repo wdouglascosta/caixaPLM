@@ -1,15 +1,9 @@
-# Programa para entregar notas de dinheiro para um cliente 
-# que solicitou determinado valor de um caixa eletronico,
-# considerando a existencia de uma quantidade finita de alguns
-# tipos de notas
-#ta errado
-
 .section .data
 
 # mensagens do programa
 
-abertura:	.asciz	"\nSuper Programa de Saque - Gustavo Batilani e William Douglas\n"
-msgtipo: 	.asciz  "\nEscolha seu tipo \n <1> Gerente\n <2> Cliente\n <3> Sair: \n Opcao: "
+abertura:	.asciz	"\nSuper Caixa Eletronico! - Gustavo Batilani e William Douglas\n"
+msgtipo: 	.asciz  "\nEscolha seu perfil \n <1> Gerente\n <2> Cliente\n <3> Sair: \n Opcao: "
 menuger:	.asciz	"\nMenu de Opcoes - Gerente: \n <1> Repor Caixa\n <2> Lançar Crédito \n <3> Relatorio \n <4> Voltar \nOpcao: "
 menucli:	.asciz	"\nMenu de Opcoes - Cliente: \n <1> Verificar Saldo\n <2> Sacar \n <3> Transferir \n <4> Voltar\nOpcao: "
 msgrepor:	.asciz	"\nEntre com os valores a repor:"
@@ -65,7 +59,7 @@ etapa:		.int	0
 .section .text
 .globl	_start
 _start:
-
+#INÍCIO DO PROGRAMA -----------------------------------------
 	pushl 	$abertura
 	call 	printf
 	je menuescolha
@@ -81,10 +75,8 @@ menuescolha:
 	movl	opcao, %eax
 	cmpl	$1,%eax
 	je	menugerente
-
 	cmpl	$2, %eax
 	je	menucliente
-
 	cmpl	$3, %eax
 	je	fim
 
@@ -101,10 +93,12 @@ menugerente:
 	je	repor
 
 	cmpl	$2, %eax
-	je	fim
+	je	_start
+	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
 
 	cmpl	$3, %eax
-	je	fim
+	je	_start
+	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
 
 	cmpl	$4, %eax
 	je	menuescolha
@@ -119,13 +113,15 @@ menucliente:
 
 	movl	opcao, %eax
 	cmpl	$1,%eax
-	je	fim
+	je	_start
+	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
 
 	cmpl	$2, %eax
 	je	sacar
 
 	cmpl	$3, %eax
-	je	fim
+	je	_start
+	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
 
 	cmpl	$4, %eax
 	je	menuescolha
