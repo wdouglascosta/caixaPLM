@@ -8,6 +8,7 @@ menuger:	.asciz	"\nMenu de Opcoes - Gerente: \n <1> Cadastrar Cliente \n <2> Rep
 menucli:	.asciz	"\nMenu de Opcoes - Cliente: \n <1> Verificar Saldo\n <2> Sacar \n <3> Transferir \n <4> Voltar\nOpcao: "
 msgrepor:	.asciz	"\nEntre com os valores a repor:"
 msgsacar:	.asciz	"\nEntre com o valor a sacar:"
+msgcadcli: 	.asciz "\nVamos cadastrar clientes! Digite os dados a seguir \n"
 
 pedenome: .asciz "\nDigite o nome do cliente: " 
 pedecpf: .asciz "\nDigite o CPF do cliente: " 
@@ -23,15 +24,15 @@ mostraconta: .asciz "\nConta: %d"
 mostrasaldo: .asciz "\nSaldo: %d" 
 mostrasenha: .asciz "\nSenha: %s"
 
-naloc: .int 77
-ptlista .int 0
+NULL: .int 0 # representa posição nula da memoria
+naloc: .int 80
+ptlista1: .int 0
 
 mostrapt: .asciz "\nptlista = %d\n"
 formastr: .asciz "%s"
 formach: .asciz "%c"
 formanum: .asciz "%d"
 
-NULL .int 0
 
 pede100:	.asciz 	"\nQuantas notas de 100 deseja? "
 pede50:		.asciz 	"\nQuantas notas de 50 deseja? "
@@ -87,6 +88,8 @@ _start:
 	pushl 	$abertura
 	call 	printf
 	je menuescolha
+
+	pushl %edi
 
 menuescolha:
 
@@ -158,12 +161,15 @@ menucliente:
 
 cadastracliente:
 
-	pushl %edi
-	
+	pushl 	$msgcadcli
+	call 	printf
+
 	pushl $pedenome
 	call printf
+	addl $8, %esp
+	pushl $formastr
+	call scanf
 	addl $4, %esp
-	call gets
 	popl %edi 	# recupera %edi
 	addl $40, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
@@ -216,11 +222,11 @@ cadastracliente:
 	addl $4, %esp
 	popl %edi 	# recupera %edi
 	addl $10, %edi 	# avanca para o proximo campo
-	pushl %edi 	# armazena na pilha
+	movl $NULL, (%edi)
 
 	subl $73,%edi # deixa %edi tal como estava no inicio
 
-	RET
+	jmp	_start
 repor:
 
 	# Pede notas de 100
@@ -368,6 +374,7 @@ sacar:
 	cmpl	%ebx, %eax
 	jg	indisponivel
 	
+	movl 	$0, %edx
 	divl	cem
 
 	cmpl	quant100, %eax
