@@ -4,7 +4,7 @@
 
 abertura:	.asciz	"\nSuper Caixa Eletronico! - Gustavo Batilani e William Douglas\n"
 msgtipo: 	.asciz  "\nEscolha seu perfil \n <1> Gerente\n <2> Cliente\n <3> Sair: \n Opcao: "
-menuger:	.asciz	"\nMenu de Opcoes - Gerente: \n <1> Repor Caixa\n <2> Lançar Crédito \n <3> Relatorio \n <4> Voltar \nOpcao: "
+menuger:	.asciz	"\nMenu de Opcoes - Gerente: \n <1> Cadastrar Cliente \n <2> Repor Caixa \n <3> Lançar Crédito \n <4> Relatorio \n <5> Voltar\nOpcao: "
 menucli:	.asciz	"\nMenu de Opcoes - Cliente: \n <1> Verificar Saldo\n <2> Sacar \n <3> Transferir \n <4> Voltar\nOpcao: "
 msgrepor:	.asciz	"\nEntre com os valores a repor:"
 msgsacar:	.asciz	"\nEntre com o valor a sacar:"
@@ -24,7 +24,12 @@ mostrasaldo: .asciz "\nSaldo: %d"
 mostrasenha: .asciz "\nSenha: %s"
 
 naloc: .int 77
-ptlisa .int 0
+ptlista .int 0
+
+mostrapt: .asciz "\nptlista = %d\n"
+formastr: .asciz "%s"
+formach: .asciz "%c"
+formanum: .asciz "%d"
 
 NULL .int 0
 
@@ -83,8 +88,6 @@ _start:
 	call 	printf
 	je menuescolha
 
-	pushl %edi
-
 menuescolha:
 
 	pushl $msgtipo
@@ -111,17 +114,20 @@ menugerente:
 
 	movl	opcao, %eax
 	cmpl	$1,%eax
-	je	repor
+	je	cadastracliente
 
-	cmpl	$2, %eax
-	je	_start
-	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
+	cmpl	$2,%eax
+	je	repor
 
 	cmpl	$3, %eax
 	je	_start
 	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
 
 	cmpl	$4, %eax
+	je	_start
+	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
+
+	cmpl	$5, %eax
 	je	menuescolha
 
 menucliente:
@@ -152,8 +158,69 @@ menucliente:
 
 cadastracliente:
 
+	pushl %edi
 	
+	pushl $pedenome
+	call printf
+	addl $4, %esp
+	call gets
+	popl %edi 	# recupera %edi
+	addl $40, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
 
+	pushl $pedecpf
+	call printf
+	addl $4, %esp
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+	popl %edi 	# recupera %edi
+	addl $11, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+
+	pushl $pedeagencia
+	call printf
+	addl $4, %esp
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+	popl %edi 	# recupera %edi
+	addl $4, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+
+	pushl $pedeconta
+	call printf
+	addl $4, %esp
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+	popl %edi 	# recupera %edi
+	addl $6, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+
+	pushl $pedesaldo
+	call printf
+	addl $4, %esp
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+	popl %edi 	# recupera %edi
+	addl $6, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+
+	pushl $pedesenha
+	call printf
+	addl $4, %esp
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+	popl %edi 	# recupera %edi
+	addl $10, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+
+	subl $73,%edi # deixa %edi tal como estava no inicio
+
+	RET
 repor:
 
 	# Pede notas de 100
