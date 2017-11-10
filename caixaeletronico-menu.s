@@ -164,6 +164,8 @@ cadastracliente:
 	pushl 	$msgcadcli
 	call 	printf
 
+	pushl %edi
+
 	pushl $pedenome
 	call printf
 	addl $8, %esp
