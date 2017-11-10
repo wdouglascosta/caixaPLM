@@ -9,6 +9,25 @@ menucli:	.asciz	"\nMenu de Opcoes - Cliente: \n <1> Verificar Saldo\n <2> Sacar 
 msgrepor:	.asciz	"\nEntre com os valores a repor:"
 msgsacar:	.asciz	"\nEntre com o valor a sacar:"
 
+pedenome: .asciz "\nDigite o nome do cliente: " 
+pedecpf: .asciz "\nDigite o CPF do cliente: " 
+pedeagencia: .asciz "\nDigite o numero da agencia da nova conta: " 
+pedeconta: .asciz "\nDigite o numero da conta: " 
+pedesaldo: .asciz "\nDigite o saldo inicial do cliente: " 
+pedesenha: .asciz "\nDigite a senha do cliente: " 
+
+mostranome: .asciz "\nNome: %s" 
+mostracpf: .asciz "\nCPF: %d" 
+mostraagencia: .asciz "\nAgência: %d" 
+mostraconta: .asciz "\nConta: %d" 
+mostrasaldo: .asciz "\nSaldo: %d" 
+mostrasenha: .asciz "\nSenha: %s"
+
+naloc: .int 77
+ptlisa .int 0
+
+NULL .int 0
+
 pede100:	.asciz 	"\nQuantas notas de 100 deseja? "
 pede50:		.asciz 	"\nQuantas notas de 50 deseja? "
 pede20:		.asciz 	"\nQuantas notas de 20 deseja? "
@@ -63,6 +82,8 @@ _start:
 	pushl 	$abertura
 	call 	printf
 	je menuescolha
+
+	pushl %edi
 
 menuescolha:
 
@@ -128,6 +149,10 @@ menucliente:
 
 
 	jmp	_start
+
+cadastracliente:
+
+	
 
 repor:
 
