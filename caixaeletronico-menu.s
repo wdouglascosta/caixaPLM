@@ -9,7 +9,9 @@ menucli:	.asciz	"\nMenu de Opcoes - Cliente: \n <1> Verificar Saldo\n <2> Sacar 
 msgrepor:	.asciz	"\nEntre com os valores a repor:"
 msgsacar:	.asciz	"\nEntre com o valor a sacar:"
 msgcadcli: 	.asciz "\nVamos cadastrar clientes! Digite os dados a seguir \n"
+msgconcli:  .asciz "\n Cliente cadastrado com sucesso! \n"
 
+#campos do cadastro de cliente GERENTE
 pedenome: .asciz "\nDigite o nome do cliente: " 
 pedecpf: .asciz "\nDigite o CPF do cliente: " 
 pedeagencia: .asciz "\nDigite o numero da agencia da nova conta: " 
@@ -17,6 +19,8 @@ pedeconta: .asciz "\nDigite o numero da conta: "
 pedesaldo: .asciz "\nDigite o saldo inicial do cliente: " 
 pedesenha: .asciz "\nDigite a senha do cliente: " 
 
+#campos do registro do Cliente
+#campos 
 mostranome: .asciz "\nNome: %s" 
 mostracpf: .asciz "\nCPF: %d" 
 mostraagencia: .asciz "\nAgência: %d" 
@@ -32,6 +36,8 @@ mostrapt: .asciz "\nptlista = %d\n"
 formastr: .asciz "%s"
 formach: .asciz "%c"
 formanum: .asciz "%d"
+
+
 
 
 pede100:	.asciz 	"\nQuantas notas de 100 deseja? "
@@ -80,6 +86,10 @@ totalcaixa:	.int	0
 totalcaixaux:	.int	0
 
 etapa:		.int	0	
+
+#Variáveis gerais
+
+tpcadastro: .int    0
 
 .section .text
 .globl	_start
@@ -159,19 +169,29 @@ menucliente:
 
 	jmp	_start
 
+
+#menu cadastro de cliente
 cadastracliente:
+
+
+	pushl $100
+	call malloc #reserva o espaço do registro
+	movl %eax, %edi
+
+	pushl %edi
 
 	pushl 	$msgcadcli
 	call 	printf
 
-	pushl %edi
-
 	pushl $pedenome
 	call printf
 	addl $8, %esp
+
 	pushl $formastr
 	call scanf
+
 	addl $4, %esp
+
 	popl %edi 	# recupera %edi
 	addl $40, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
@@ -226,9 +246,20 @@ cadastracliente:
 	addl $10, %edi 	# avanca para o proximo campo
 	movl $NULL, (%edi)
 
-	subl $73,%edi # deixa %edi tal como estava no inicio
+
+	#subl $73,%edi # deixa %edi tal como estava no inicio
+
+	# pushl %eax
+	# call printf
+
 
 	jmp	_start
+
+#salvando clientes na lista
+
+
+
+
 repor:
 
 	# Pede notas de 100
