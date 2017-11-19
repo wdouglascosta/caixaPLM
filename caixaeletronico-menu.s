@@ -28,17 +28,25 @@ mostraconta: .asciz "\nConta: %d"
 mostrasaldo: .asciz "\nSaldo: %d" 
 mostrasenha: .asciz "\nSenha: %s"
 
+limpabuf: .string "%*c"
+
 NULL: .int 0 # representa posição nula da memoria
-naloc: .int 80
-ptlista1: .int 0
+naloc: .int 100
+ptlista: .int NULL
+ptreg:	.int NULL
+
+nome:	.space 40
+cpf:	.space 11
+agencia:	.space 4
+conta:	.space 6
+saldo:	.space 6
+senha:	.space 10
+prox:	.int NULL
 
 mostrapt: .asciz "\nptlista = %d\n"
 formastr: .asciz "%s"
 formach: .asciz "%c"
 formanum: .asciz "%d"
-
-
-
 
 pede100:	.asciz 	"\nQuantas notas de 100 deseja? "
 pede50:		.asciz 	"\nQuantas notas de 50 deseja? "
@@ -127,7 +135,7 @@ menugerente:
 
 	movl	opcao, %eax
 	cmpl	$1,%eax
-	je	cadastracliente
+	je	cadastrarcli
 
 	cmpl	$2,%eax
 	je	repor
@@ -171,12 +179,12 @@ menucliente:
 
 
 #menu cadastro de cliente
-cadastracliente:
+pedecliente:
 
 
-	pushl $100
-	call malloc #reserva o espaço do registro
-	movl %eax, %edi
+	#pushl $100
+	#call malloc #reserva o espaço do registro
+	#movl %eax, %edi
 
 	pushl %edi
 
@@ -247,16 +255,38 @@ cadastracliente:
 	movl $NULL, (%edi)
 
 
-	#subl $73,%edi # deixa %edi tal como estava no inicio
+	subl $73,%edi # deixa %edi tal como estava no inici0
 
-	# pushl %eax
-	# call printf
-
-
-	jmp	_start
+	RET
 
 #salvando clientes na lista
 
+cadastrarcli:
+
+	movl naloc, %ecx
+	pushl %ecx
+	call malloc
+	movl %eax, ptreg
+	
+	pushl ptreg
+	pushl $mostrapt
+	call printf
+	
+	addl $16, %esp
+	
+	movl ptreg, %edi
+	call pedecliente
+	
+	movl ptlista, %eax
+	movl %eax, 100(%edi)
+	movl %edi, ptlista
+
+	pushl $msgconcli
+	call printf
+	addl $4, %esp
+	
+	jmp menugerente
+	
 
 
 
