@@ -11,6 +11,7 @@ msgsacar:	.asciz	"\nEntre com o valor a sacar:"
 msgcadcli: 	.asciz "\nVamos cadastrar clientes! Digite os dados a seguir \n"
 msgconcli:  .asciz "\n Cliente cadastrado com sucesso! \n"
 msgrelatorio:	.asciz "\nSegue relatório de todos os clientes: \n"
+vazio: .asciz "\nNao existe cadastro \n"
 
 #campos do cadastro de cliente GERENTE
 pedenome: .asciz "\nDigite o nome do cliente: " 
@@ -181,11 +182,6 @@ menucliente:
 #menu cadastro de cliente
 pedecliente:
 
-
-	#pushl $100
-	#call malloc #reserva o espaço do registro
-	#movl %eax, %edi
-
 	pushl %edi
 
 	pushl 	$msgcadcli
@@ -255,7 +251,7 @@ pedecliente:
 	movl $NULL, (%edi)
 
 
-	subl $73,%edi # deixa %edi tal como estava no inici0
+	subl $77,%edi # deixa %edi tal como estava no inici0
 
 	RET
 
@@ -291,12 +287,44 @@ relatorio:
 
 	pushl $msgrelatorio
 	call printf
+
+	movl ptlista, %edi
+	cmpl $NULL, %edi
+	jnz continua
+
+	pushl $vazio
+	call printf
+	addl $4, %esp	
+
+	jmp menugerente
+
+continua:
+	movl ptlista, %edi
+	movl $1, %ecx
+
+volta:
+	cmpl $NULL, %edi
+	jz menugerente
+	
+	movl 4(%esp), %edi
+	call mostrarelatorio
+	
+	popl %ecx
+	incl %ecx
+	popl %edi
+	movl 100(%edi), %edi
+
+	jmp volta
+	
+	jmp menugerente
+
+mostrarelatorio:
 	
 	pushl %edi
-	
+
 	pushl $mostranome
 	call printf
-	addl $4, %esp
+	addl $8, %esp
 
 	popl %edi
 	addl $40, %edi
@@ -337,22 +365,17 @@ relatorio:
 	popl %edi
 	addl $6, %edi
 	pushl %edi
-	
-	pushl (%edi)
+
 	pushl $mostrasenha
 	call printf
-	addl $8, %esp
-	
-	popl %edi
-	addl $10, %edi
-	pushl %edi
+	addl $4, %esp
 
 	popl %edi
 
-	subl $77, %edi
+	subl $67, %edi
 
-	jmp menugerente
 	
+	RET
 
 repor:
 
@@ -477,7 +500,7 @@ repor:
 
 	addl	$100, %esp
 
-	jmp	_start
+	jmp	menugerente
 
 sacar:
 	
@@ -737,7 +760,7 @@ pagar2:
 	pushl	$mostranotas
 	call	printf
 
-	jmp	_start
+	jmp	menucliente
 
 indisponivel:
 	
