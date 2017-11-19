@@ -10,6 +10,7 @@ msgrepor:	.asciz	"\nEntre com os valores a repor:"
 msgsacar:	.asciz	"\nEntre com o valor a sacar:"
 msgcadcli: 	.asciz "\nVamos cadastrar clientes! Digite os dados a seguir \n"
 msgconcli:  .asciz "\n Cliente cadastrado com sucesso! \n"
+msgrelatorio:	.asciz "\nSegue relatório de todos os clientes: \n"
 
 #campos do cadastro de cliente GERENTE
 pedenome: .asciz "\nDigite o nome do cliente: " 
@@ -145,9 +146,8 @@ menugerente:
 	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
 
 	cmpl	$4, %eax
-	je	_start
-	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
-
+	je	relatorio
+	
 	cmpl	$5, %eax
 	je	menuescolha
 
@@ -286,9 +286,73 @@ cadastrarcli:
 	addl $4, %esp
 	
 	jmp menugerente
+
+relatorio:
+
+	pushl $msgrelatorio
+	call printf
 	
+	pushl %edi
+	
+	pushl $mostranome
+	call printf
+	addl $4, %esp
 
+	popl %edi
+	addl $40, %edi
+	pushl %edi
 
+	pushl (%edi)
+	pushl $mostracpf
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $11, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostraagencia
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostraconta
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $6, %edi
+	pushl %edi
+
+	pushl (%edi)
+	pushl $mostrasaldo
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $6, %edi
+	pushl %edi
+	
+	pushl (%edi)
+	pushl $mostrasenha
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $10, %edi
+	pushl %edi
+
+	popl %edi
+
+	subl $77, %edi
+
+	jmp menugerente
+	
 
 repor:
 
