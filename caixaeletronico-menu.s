@@ -186,30 +186,17 @@ pedecliente:
 
 	pushl 	$msgcadcli
 	call 	printf
-
-	pushl $pedenome
-	call printf
-	addl $8, %esp
-
-	pushl $formastr
-	call scanf
-
-	addl $4, %esp
-
-	popl %edi 	# recupera %edi
-	addl $40, %edi 	# avanca para o proximo campo
-	pushl %edi 	# armazena na pilha
-
-	pushl $pedecpf
+	#NUMERO DE CONTA
+	pushl $pedeconta
 	call printf
 	addl $4, %esp
 	pushl $formanum
 	call scanf
 	addl $4, %esp
 	popl %edi 	# recupera %edi
-	addl $11, %edi 	# avanca para o proximo campo
+	addl $6, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
-
+#NUMERO DE AGÊNCIA
 	pushl $pedeagencia
 	call printf
 	addl $4, %esp
@@ -220,14 +207,14 @@ pedecliente:
 	addl $4, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
 
-	pushl $pedeconta
+	pushl $pedecpf
 	call printf
 	addl $4, %esp
 	pushl $formanum
 	call scanf
 	addl $4, %esp
 	popl %edi 	# recupera %edi
-	addl $6, %edi 	# avanca para o proximo campo
+	addl $11, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
 
 	pushl $pedesaldo
@@ -248,6 +235,16 @@ pedecliente:
 	addl $4, %esp
 	popl %edi 	# recupera %edi
 	addl $10, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+	
+	pushl $pedenome
+	call printf
+	addl $8, %esp
+	pushl $formastr
+	call scanf
+	addl $4, %esp
+	popl %edi 	# recupera %edi
+	addl $40, %edi 	# avanca para o proximo campo
 	movl $NULL, (%edi)
 
 
