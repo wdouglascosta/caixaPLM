@@ -4,10 +4,59 @@
 
 abertura:	.asciz	"\nSuper Caixa Eletronico! - Gustavo Batilani e William Douglas\n"
 msgtipo: 	.asciz  "\nEscolha seu perfil \n <1> Gerente\n <2> Cliente\n <3> Sair: \n Opcao: "
-menuger:	.asciz	"\nMenu de Opcoes - Gerente: \n <1> Repor Caixa\n <2> Lançar Crédito \n <3> Relatorio \n <4> Voltar \nOpcao: "
+menuger:	.asciz	"\nMenu de Opcoes - Gerente: \n <1> Cadastrar Cliente \n <2> Repor Caixa \n <3> Lançar Crédito \n <4> Relatorio \n <5> Voltar\nOpcao: "
 menucli:	.asciz	"\nMenu de Opcoes - Cliente: \n <1> Verificar Saldo\n <2> Sacar \n <3> Transferir \n <4> Voltar\nOpcao: "
 msgrepor:	.asciz	"\nEntre com os valores a repor:"
 msgsacar:	.asciz	"\nEntre com o valor a sacar:"
+msgcadcli: 	.asciz "\nVamos cadastrar clientes! Digite os dados a seguir \n"
+msgconcli:  .asciz "\n Cliente cadastrado com sucesso! \n"
+msgrelatorio:	.asciz "\nSegue relatório de todos os clientes: \n"
+vazio: .asciz "\nNao existe cadastro \n"
+msglogin: .asciz "\nDigite seu nome e senha para entrar: \n"
+msgnlogin: .asciz "\nNome: \n"
+msgsenha: .asciz "\nSenha: \n"
+msglogincli: .asciz "\nDigite seu CPF (somente numeros) e senha para entrar: \n"
+msgclogin: .asciz "\nCPF: \n"
+
+#campos do cadastro de cliente GERENTE
+pedenome: .asciz "\nDigite o nome do cliente: " 
+pedecpf: .asciz "\nDigite o CPF do cliente: " 
+pedeagencia: .asciz "\nDigite o numero da agencia da nova conta: " 
+pedeconta: .asciz "\nDigite o numero da conta: " 
+pedesaldo: .asciz "\nDigite o saldo inicial do cliente: " 
+pedesenha: .asciz "\nDigite a senha do cliente: " 
+
+#campos do registro do Cliente
+#campos 
+mostranome: .asciz "\nNome: %s" 
+mostracpf: .asciz "\nCPF: %d" 
+mostraagencia: .asciz "\nAgência: %d" 
+mostraconta: .asciz "\nConta: %d" 
+mostrasaldo: .asciz "\nSaldo: %d" 
+mostrasenha: .asciz "\nSenha: %s"
+
+limpabuf: .string "%*c"
+
+NULL: .int 0 # representa posição nula da memoria
+naloc: .int 100
+ptlista: .int NULL
+ptreg:	.int NULL
+
+# REDEFINIR OS TAMANHOS DOS CAMPOS DE registro
+# SMPRE MULTIPLOS DE 4 BYTES
+
+# conta:	.space 4
+# agencia:	.space 4
+# cpf:	.space 4
+# saldo:	.space 4
+# senha:	.space 6
+# nome:	.space 50
+# prox:	.int NULL
+
+mostrapt: .asciz "\nptlista = %d\n"
+formastr: .asciz "%s"
+formach: .asciz "%c"
+formanum: .asciz "%d"
 
 pede100:	.asciz 	"\nQuantas notas de 100 deseja? "
 pede50:		.asciz 	"\nQuantas notas de 50 deseja? "
@@ -56,13 +105,21 @@ totalcaixaux:	.int	0
 
 etapa:		.int	0	
 
+#Variáveis gerais
+
+tpcadastro: .int    0
+teste:		.asciz 	"\nTeste -------- "
+
 .section .text
-.globl	_start
+.globl _start
 _start:
+
 #INÍCIO DO PROGRAMA -----------------------------------------
 	pushl 	$abertura
 	call 	printf
 	je menuescolha
+
+	pushl %edi
 
 menuescolha:
 
@@ -74,11 +131,54 @@ menuescolha:
 
 	movl	opcao, %eax
 	cmpl	$1,%eax
-	je	menugerente
+	je	logingerente
 	cmpl	$2, %eax
-	je	menucliente
+	je	logincliente
 	cmpl	$3, %eax
 	je	fim
+
+logingerente:
+
+	pushl	$msglogin
+	call	printf
+	pushl	$formach
+	pushl   $msgnlogin
+	call	printf
+	pushl	$formach
+	pushl $formastr
+	call scanf
+	pushl $msgsenha
+	call	printf
+	pushl	$formach
+	pushl $formastr
+	call scanf
+
+	pushl	$formach
+	addl $20, %esp
+
+	jmp menugerente	
+
+
+logincliente:
+
+	pushl	$msglogin
+	call	printf
+	pushl	$formach
+	pushl   $msgclogin
+	call	printf
+	pushl	$formach
+	pushl $formastr
+	call scanf
+	pushl $msgsenha
+	call	printf
+	pushl	$formach
+	pushl $formastr
+	call scanf
+
+	addl $20, %esp
+
+	pushl	$formach
+	jmp menucliente
 
 menugerente:
 
@@ -90,17 +190,19 @@ menugerente:
 
 	movl	opcao, %eax
 	cmpl	$1,%eax
-	je	repor
+	je	cadastrarcli
 
-	cmpl	$2, %eax
-	je	_start
-	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
+	cmpl	$2,%eax
+	je	repor
 
 	cmpl	$3, %eax
 	je	_start
 	#IMPLEMENTAR AQUI A FUNÇÃO DESEJADA ------------------------------------------
 
 	cmpl	$4, %eax
+	je	relatorio
+	
+	cmpl	$5, %eax
 	je	menuescolha
 
 menucliente:
@@ -128,6 +230,227 @@ menucliente:
 
 
 	jmp	_start
+
+
+#menu cadastro de cliente
+pedecliente:
+
+	movl ptreg, %edi
+	pushl %edi
+
+	pushl 	$msgcadcli
+	call 	printf
+
+	
+	#NUMERO DE CONTA
+	pushl $pedeconta
+	call printf
+	addl $8, %esp
+
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+
+	popl %edi 	# recupera %edi
+	addl $6, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+	
+	#NUMERO DE AGÊNCIA
+	pushl $pedeagencia
+	call printf
+	addl $4, %esp
+
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+
+	popl %edi 	# recupera %edi
+	addl $4, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+
+	pushl $pedecpf
+	call printf
+	addl $4, %esp
+
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+
+	popl %edi 	# recupera %edi
+	addl $11, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+
+	pushl $pedesaldo
+	call printf
+	addl $4, %esp
+
+	pushl $formanum
+	call scanf
+	addl $4, %esp
+
+	popl %edi 	# recupera %edi
+	addl $6, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+
+	pushl $pedesenha
+	call printf
+	addl $4, %esp
+
+	pushl $formastr
+	call scanf
+	addl $4, %esp
+
+	popl %edi 	# recupera %edi
+	addl $10, %edi 	# avanca para o proximo campo
+	pushl %edi 	# armazena na pilha
+	
+	pushl $pedenome
+	call printf
+	addl $4, %esp
+
+	pushl $formastr
+	call scanf
+	addl $4, %esp
+
+	popl %edi 	# recupera %edi
+	# addl $40, %edi 	# avanca para o proximo campo
+	# # movl %, (%edi)
+
+	# subl $77,%edi # deixa %edi tal como estava no inici0
+
+
+	RET
+#salvando clientes na lista
+
+cadastrarcli:
+
+	movl naloc, %ecx
+	pushl %ecx
+	call malloc
+	movl %eax, ptreg
+	
+	pushl ptreg
+	pushl $mostrapt
+	call printf
+	
+	addl $12, %esp
+	
+
+	call pedecliente
+	
+
+	movl ptreg, %edi
+
+	movl ptlista, %eax
+	movl %eax, 96(%edi)
+	movl %edi, ptlista
+
+	pushl $msgconcli
+	call printf
+	addl $4, %esp
+	
+	jmp menugerente
+
+relatorio:
+
+	pushl $msgrelatorio
+	call printf
+	addl $4, %esp
+
+	movl ptlista, %edi
+	cmpl $NULL, %edi
+	jnz continua
+
+	pushl $vazio
+	call printf
+	addl $4, %esp	
+
+	jmp menugerente
+
+continua:
+	movl ptlista, %edi
+	movl $1, %ecx
+
+volta:
+	cmpl $NULL, %edi
+	jz menugerente
+	
+	# movl 4(%esp), %edi
+	call mostrarelatorio
+	
+	popl %ecx
+	incl %ecx
+	popl %edi
+	movl 100(%edi), %edi
+
+	jmp volta
+	
+	jmp menugerente
+
+mostrarelatorio:
+
+	pushl %edi
+
+	movl (%edi), %eax
+	pushl %eax
+
+	pushl $mostraconta
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $6, %edi
+	pushl %edi	
+
+	movl (%edi), %eax
+	pushl %eax
+	pushl $mostraagencia
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $4, %edi
+	pushl %edi
+
+	movl (%edi), %eax
+	pushl %eax
+	pushl $mostracpf
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $11, %edi
+	pushl %edi
+
+	movl (%edi), %eax
+	pushl %eax
+	pushl $mostrasaldo
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $6, %edi
+	pushl %edi
+
+	pushl %edi
+	pushl $mostrasenha
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $10, %edi
+	pushl %edi
+
+	pushl $mostranome
+	call printf
+	addl $4, %esp
+
+	popl %edi
+
+	subl $37, %edi
+
+	
+	RET
 
 repor:
 
@@ -252,7 +575,7 @@ repor:
 
 	addl	$100, %esp
 
-	jmp	_start
+	jmp	menugerente
 
 sacar:
 	
@@ -276,6 +599,7 @@ sacar:
 	cmpl	%ebx, %eax
 	jg	indisponivel
 	
+	movl 	$0, %edx
 	divl	cem
 
 	cmpl	quant100, %eax
@@ -511,7 +835,7 @@ pagar2:
 	pushl	$mostranotas
 	call	printf
 
-	jmp	_start
+	jmp	menucliente
 
 indisponivel:
 	
