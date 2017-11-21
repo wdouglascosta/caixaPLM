@@ -107,8 +107,9 @@ etapa:		.int	0
 tpcadastro: .int    0
 
 .section .text
-.globl	_start
+.globl _start
 _start:
+
 #INÍCIO DO PROGRAMA -----------------------------------------
 	pushl 	$abertura
 	call 	printf
@@ -128,7 +129,7 @@ menuescolha:
 	cmpl	$1,%eax
 	je	logingerente
 	cmpl	$2, %eax
-	je	menucliente
+	je	logincliente
 	cmpl	$3, %eax
 	je	fim
 
@@ -136,14 +137,44 @@ logingerente:
 
 	pushl	$msglogin
 	call	printf
+	pushl	$formach
 	pushl   $msgnlogin
+	call	printf
+	pushl	$formach
+	pushl $formastr
 	call scanf
 	pushl $msgsenha
+	call	printf
+	pushl	$formach
+	pushl $formastr
 	call scanf
 
-	addl $4, %esp
+	pushl	$formach
+	addl $20, %esp
 
 	jmp menugerente	
+
+
+logincliente:
+
+	pushl	$msglogin
+	call	printf
+	pushl	$formach
+	pushl   $msgclogin
+	call	printf
+	pushl	$formach
+	pushl $formastr
+	call scanf
+	pushl $msgsenha
+	call	printf
+	pushl	$formach
+	pushl $formastr
+	call scanf
+
+	addl $20, %esp
+
+	pushl	$formach
+	jmp menucliente
 
 menugerente:
 
@@ -204,6 +235,7 @@ pedecliente:
 
 	pushl 	$msgcadcli
 	call 	printf
+
 	#NUMERO DE CONTA
 	pushl $pedeconta
 	call printf
@@ -214,7 +246,8 @@ pedecliente:
 	popl %edi 	# recupera %edi
 	addl $6, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
-#NUMERO DE AGÊNCIA
+	
+	#NUMERO DE AGÊNCIA
 	pushl $pedeagencia
 	call printf
 	addl $4, %esp
@@ -337,12 +370,21 @@ mostrarelatorio:
 	
 	pushl %edi
 
-	pushl $mostranome
+	pushl $mostraconta
 	call printf
 	addl $8, %esp
-
+	
 	popl %edi
-	addl $40, %edi
+	addl $6, %edi
+	pushl %edi	
+
+	pushl (%edi)
+	pushl $mostraagencia
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $4, %edi
 	pushl %edi
 
 	pushl (%edi)
@@ -355,24 +397,6 @@ mostrarelatorio:
 	pushl %edi
 
 	pushl (%edi)
-	pushl $mostraagencia
-	call printf
-	addl $8, %esp
-	
-	popl %edi
-	addl $4, %edi
-	pushl %edi
-
-	pushl (%edi)
-	pushl $mostraconta
-	call printf
-	addl $8, %esp
-	
-	popl %edi
-	addl $6, %edi
-	pushl %edi
-
-	pushl (%edi)
 	pushl $mostrasaldo
 	call printf
 	addl $8, %esp
@@ -381,13 +405,22 @@ mostrarelatorio:
 	addl $6, %edi
 	pushl %edi
 
+	pushl (%edi)
 	pushl $mostrasenha
+	call printf
+	addl $8, %esp
+	
+	popl %edi
+	addl $10, %edi
+	pushl %edi
+
+	pushl $mostranome
 	call printf
 	addl $4, %esp
 
 	popl %edi
 
-	subl $67, %edi
+	subl $37, %edi
 
 	
 	RET
