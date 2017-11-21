@@ -42,13 +42,16 @@ naloc: .int 100
 ptlista: .int NULL
 ptreg:	.int NULL
 
-nome:	.space 40
-cpf:	.space 11
-agencia:	.space 4
-conta:	.space 6
-saldo:	.space 6
-senha:	.space 10
-prox:	.int NULL
+# REDEFINIR OS TAMANHOS DOS CAMPOS DE registro
+# SMPRE MULTIPLOS DE 4 BYTES
+
+# conta:	.space 4
+# agencia:	.space 4
+# cpf:	.space 4
+# saldo:	.space 4
+# senha:	.space 6
+# nome:	.space 50
+# prox:	.int NULL
 
 mostrapt: .asciz "\nptlista = %d\n"
 formastr: .asciz "%s"
@@ -105,6 +108,7 @@ etapa:		.int	0
 #Variáveis gerais
 
 tpcadastro: .int    0
+teste:		.asciz 	"\nTeste -------- "
 
 .section .text
 .globl _start
@@ -231,18 +235,22 @@ menucliente:
 #menu cadastro de cliente
 pedecliente:
 
+	movl ptreg, %edi
 	pushl %edi
 
 	pushl 	$msgcadcli
 	call 	printf
 
+	
 	#NUMERO DE CONTA
 	pushl $pedeconta
 	call printf
-	addl $4, %esp
+	addl $8, %esp
+
 	pushl $formanum
 	call scanf
 	addl $4, %esp
+
 	popl %edi 	# recupera %edi
 	addl $6, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
@@ -251,9 +259,11 @@ pedecliente:
 	pushl $pedeagencia
 	call printf
 	addl $4, %esp
+
 	pushl $formanum
 	call scanf
 	addl $4, %esp
+
 	popl %edi 	# recupera %edi
 	addl $4, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
@@ -261,9 +271,11 @@ pedecliente:
 	pushl $pedecpf
 	call printf
 	addl $4, %esp
+
 	pushl $formanum
 	call scanf
 	addl $4, %esp
+
 	popl %edi 	# recupera %edi
 	addl $11, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
@@ -271,9 +283,11 @@ pedecliente:
 	pushl $pedesaldo
 	call printf
 	addl $4, %esp
+
 	pushl $formanum
 	call scanf
 	addl $4, %esp
+
 	popl %edi 	# recupera %edi
 	addl $6, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
@@ -281,28 +295,31 @@ pedecliente:
 	pushl $pedesenha
 	call printf
 	addl $4, %esp
-	pushl $formanum
+
+	pushl $formastr
 	call scanf
 	addl $4, %esp
+
 	popl %edi 	# recupera %edi
 	addl $10, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
 	
 	pushl $pedenome
 	call printf
-	addl $8, %esp
+	addl $4, %esp
+
 	pushl $formastr
 	call scanf
 	addl $4, %esp
+
 	popl %edi 	# recupera %edi
-	addl $40, %edi 	# avanca para o proximo campo
-	movl $NULL, (%edi)
+	# addl $40, %edi 	# avanca para o proximo campo
+	# # movl %, (%edi)
 
+	# subl $77,%edi # deixa %edi tal como estava no inici0
 
-	subl $77,%edi # deixa %edi tal como estava no inici0
 
 	RET
-
 #salvando clientes na lista
 
 cadastrarcli:
@@ -316,13 +333,16 @@ cadastrarcli:
 	pushl $mostrapt
 	call printf
 	
-	addl $16, %esp
+	addl $12, %esp
 	
-	movl ptreg, %edi
+
 	call pedecliente
 	
+
+	movl ptreg, %edi
+
 	movl ptlista, %eax
-	movl %eax, 100(%edi)
+	movl %eax, 96(%edi)
 	movl %edi, ptlista
 
 	pushl $msgconcli
@@ -335,6 +355,7 @@ relatorio:
 
 	pushl $msgrelatorio
 	call printf
+	addl $4, %esp
 
 	movl ptlista, %edi
 	cmpl $NULL, %edi
@@ -354,7 +375,7 @@ volta:
 	cmpl $NULL, %edi
 	jz menugerente
 	
-	movl 4(%esp), %edi
+	# movl 4(%esp), %edi
 	call mostrarelatorio
 	
 	popl %ecx
@@ -367,8 +388,11 @@ volta:
 	jmp menugerente
 
 mostrarelatorio:
-	
+
 	pushl %edi
+
+	movl (%edi), %eax
+	pushl %eax
 
 	pushl $mostraconta
 	call printf
@@ -378,7 +402,8 @@ mostrarelatorio:
 	addl $6, %edi
 	pushl %edi	
 
-	pushl (%edi)
+	movl (%edi), %eax
+	pushl %eax
 	pushl $mostraagencia
 	call printf
 	addl $8, %esp
@@ -387,7 +412,8 @@ mostrarelatorio:
 	addl $4, %edi
 	pushl %edi
 
-	pushl (%edi)
+	movl (%edi), %eax
+	pushl %eax
 	pushl $mostracpf
 	call printf
 	addl $8, %esp
@@ -396,7 +422,8 @@ mostrarelatorio:
 	addl $11, %edi
 	pushl %edi
 
-	pushl (%edi)
+	movl (%edi), %eax
+	pushl %eax
 	pushl $mostrasaldo
 	call printf
 	addl $8, %esp
@@ -405,7 +432,7 @@ mostrarelatorio:
 	addl $6, %edi
 	pushl %edi
 
-	pushl (%edi)
+	pushl %edi
 	pushl $mostrasenha
 	call printf
 	addl $8, %esp
