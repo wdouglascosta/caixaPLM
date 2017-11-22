@@ -1,3 +1,6 @@
+# as -32 caixaeletronico-menu.s -o caixaeletronico-menu.o; ld -m elf_i386 caixaeletronico-menu.o -l c -dynamic-linker /lib/ld-linux.so.2 -o caixaeletronico-menu; ./caixaeletronico-menu 
+# comando para montar, linkar e executar o programa no terminal
+
 .section .data
 
 # mensagens do programa
@@ -28,12 +31,12 @@ pedesenha: .asciz "\nDigite a senha do cliente: "
 
 #campos do registro do Cliente
 #campos 
-mostranome: .asciz "\nNome: %s" 
-mostracpf: .asciz "\nCPF: %d" 
-mostraagencia: .asciz "\nAgência: %d" 
 mostraconta: .asciz "\nConta: %d" 
+mostraagencia: .asciz "\nAgência: %d" 
+mostracpf: .asciz "\nCPF: %d" 
 mostrasaldo: .asciz "\nSaldo: %d" 
 mostrasenha: .asciz "\nSenha: %s"
+mostranome: .asciz "\nNome: %s" 
 
 limpabuf: .string "%*c"
 
@@ -45,12 +48,12 @@ ptreg:	.int NULL
 # REDEFINIR OS TAMANHOS DOS CAMPOS DE registro
 # SMPRE MULTIPLOS DE 4 BYTES
 
-# conta:	.space 4
-# agencia:	.space 4
-# cpf:	.space 4
-# saldo:	.space 4
-# senha:	.space 6
-# nome:	.space 50
+# conta:	.space 8
+# agencia:	.space 8
+# cpf:	.space 16
+# saldo:	.space 8
+# senha:	.space 8
+# nome:	.space 48
 # prox:	.int NULL
 
 mostrapt: .asciz "\nptlista = %d\n"
@@ -252,7 +255,7 @@ pedecliente:
 	addl $4, %esp
 
 	popl %edi 	# recupera %edi
-	addl $6, %edi 	# avanca para o proximo campo
+	addl $8, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
 	
 	#NUMERO DE AGÊNCIA
@@ -265,7 +268,7 @@ pedecliente:
 	addl $4, %esp
 
 	popl %edi 	# recupera %edi
-	addl $4, %edi 	# avanca para o proximo campo
+	addl $8, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
 
 	pushl $pedecpf
@@ -277,7 +280,7 @@ pedecliente:
 	addl $4, %esp
 
 	popl %edi 	# recupera %edi
-	addl $11, %edi 	# avanca para o proximo campo
+	addl $16, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
 
 	pushl $pedesaldo
@@ -289,7 +292,7 @@ pedecliente:
 	addl $4, %esp
 
 	popl %edi 	# recupera %edi
-	addl $6, %edi 	# avanca para o proximo campo
+	addl $8, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
 
 	pushl $pedesenha
@@ -301,7 +304,7 @@ pedecliente:
 	addl $4, %esp
 
 	popl %edi 	# recupera %edi
-	addl $10, %edi 	# avanca para o proximo campo
+	addl $8, %edi 	# avanca para o proximo campo
 	pushl %edi 	# armazena na pilha
 	
 	pushl $pedenome
@@ -390,7 +393,7 @@ volta:
 mostrarelatorio:
 
 	pushl %edi
-
+# MOSTRA CONTA------------------------------
 	movl (%edi), %eax
 	pushl %eax
 
@@ -399,9 +402,10 @@ mostrarelatorio:
 	addl $8, %esp
 	
 	popl %edi
-	addl $6, %edi
+	addl $8, %edi
 	pushl %edi	
 
+# MOSTRA AGENCIA------------------------------
 	movl (%edi), %eax
 	pushl %eax
 	pushl $mostraagencia
@@ -409,9 +413,10 @@ mostrarelatorio:
 	addl $8, %esp
 	
 	popl %edi
-	addl $4, %edi
+	addl $8, %edi
 	pushl %edi
 
+# MOSTRA CPF------------------------------
 	movl (%edi), %eax
 	pushl %eax
 	pushl $mostracpf
@@ -419,9 +424,10 @@ mostrarelatorio:
 	addl $8, %esp
 	
 	popl %edi
-	addl $11, %edi
+	addl $16, %edi
 	pushl %edi
 
+# MOSTRA SALDO------------------------------
 	movl (%edi), %eax
 	pushl %eax
 	pushl $mostrasaldo
@@ -429,25 +435,29 @@ mostrarelatorio:
 	addl $8, %esp
 	
 	popl %edi
-	addl $6, %edi
+	addl $8, %edi
 	pushl %edi
 
+# MOSTRA SENHA------------------------------
 	pushl %edi
 	pushl $mostrasenha
 	call printf
 	addl $8, %esp
 	
 	popl %edi
-	addl $10, %edi
+	addl $8, %edi
 	pushl %edi
 
+
+# MOSTRA NOME------------------------------
+	pushl %edi
 	pushl $mostranome
 	call printf
-	addl $4, %esp
+	addl $8, %esp
 
 	popl %edi
 
-	subl $37, %edi
+	subl $48, %edi
 
 	
 	RET
