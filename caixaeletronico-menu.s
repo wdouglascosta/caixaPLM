@@ -150,14 +150,14 @@ logingerente:
 	pushl	$formach
 	pushl   $msgnlogin
 	call	printf
-	pushl	$formach
 	pushl $formastr
 	call scanf
+	pushl	$formach
 	pushl $msgsenha
 	call	printf
-	pushl	$formach
 	pushl $formastr
 	call scanf
+	pushl	$formach
 
 	pushl	$formach
 	addl $20, %esp
@@ -333,7 +333,7 @@ pedecliente:
 
 
 
-	#subl $96,%edi # deixa %edi tal como estava no inici0
+	subl $96,%edi # deixa %edi tal como estava no inici0
 
 
 	RET
