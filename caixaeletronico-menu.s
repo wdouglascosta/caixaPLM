@@ -1,5 +1,5 @@
-# as -32 caixaeletronico-menu.s -o caixaeletronico-menu.o; ld -m elf_i386 caixaeletronico-menu.o -l c -dynamic-linker /lib/ld-linux.so.2 -o caixaeletronico-menu; ./caixaeletronico-menu 
-# comando para montar, linkar e executar o programa no terminal
+#as -32 caixaeletronico-menu.s -o caixaeletronico-menu.o; ld -m elf_i386 caixaeletronico-menu.o -l c -dynamic-linker /lib/ld-linux.so.2 -o caixaeletronico-menu; ./caixaeletronico-menu 
+#comando para montar, linkar e executar o programa no terminal
 
 .section .data
 
@@ -21,6 +21,8 @@ msgsenha: .asciz "\nSenha: \n"
 msglogincli: .asciz "\nDigite seu CPF (somente numeros) e senha para entrar: \n"
 msgclogin: .asciz "\nCPF: \n"
 
+titreg: .asciz "\nRegistro: %d\n"
+
 #campos do cadastro de cliente GERENTE
 pedenome: .asciz "\nDigite o nome do cliente: " 
 pedecpf: .asciz "\nDigite o CPF do cliente: " 
@@ -36,7 +38,7 @@ mostraagencia: .asciz "\nAgência: %d"
 mostracpf: .asciz "\nCPF: %d" 
 mostrasaldo: .asciz "\nSaldo: %d" 
 mostrasenha: .asciz "\nSenha: %s"
-mostranome: .asciz "\nNome: %s" 
+mostranome: .asciz "\nNome: %s \n" 
 
 limpabuf: .string "%*c"
 
@@ -44,6 +46,7 @@ NULL: .int 0 # representa posição nula da memoria
 naloc: .int 100
 ptlista: .int NULL
 ptreg:	.int NULL
+prox: .int 0
 
 # REDEFINIR OS TAMANHOS DOS CAMPOS DE registro
 # SMPRE MULTIPLOS DE 4 BYTES
@@ -316,10 +319,21 @@ pedecliente:
 	addl $4, %esp
 
 	popl %edi 	# recupera %edi
-	# addl $40, %edi 	# avanca para o proximo campo
-	# # movl %, (%edi)
+	addl $48, %edi 	# avanca para o proximo campo
 
-	# subl $77,%edi # deixa %edi tal como estava no inici0
+	# movl %edi, prox
+	# movl ptlista, %edi
+	# movl ptreg,%ecx
+	# movl %ecx, ptlista
+	# movl ptreg, %eax
+	# movl %eax, prox
+	# movl prox, %edi
+
+	movl $NULL, (%edi)
+
+
+
+	#subl $96,%edi # deixa %edi tal como estava no inici0
 
 
 	RET
@@ -339,11 +353,9 @@ cadastrarcli:
 	addl $12, %esp
 	
 
+	movl ptreg, %edi
 	call pedecliente
 	
-
-	movl ptreg, %edi
-
 	movl ptlista, %eax
 	movl %eax, 96(%edi)
 	movl %edi, ptlista
@@ -377,17 +389,23 @@ continua:
 volta:
 	cmpl $NULL, %edi
 	jz menugerente
+
+	pushl %edi
+	pushl %ecx
+	pushl $titreg
+	call printf
+	addl $4, %esp
 	
-	# movl 4(%esp), %edi
+	#movl 4(%esp), %edi
 	call mostrarelatorio
-	
+
 	popl %ecx
 	incl %ecx
 	popl %edi
-	movl 100(%edi), %edi
+	movl 96(%edi), %edi
 
 	jmp volta
-	
+
 	jmp menugerente
 
 mostrarelatorio:
@@ -447,18 +465,17 @@ mostrarelatorio:
 	popl %edi
 	addl $8, %edi
 	pushl %edi
-
-
+	
 # MOSTRA NOME------------------------------
+
 	pushl %edi
 	pushl $mostranome
 	call printf
 	addl $8, %esp
-
+	
 	popl %edi
 
 	subl $48, %edi
-
 	
 	RET
 
